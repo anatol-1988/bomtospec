@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     bomtospec
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~
 
     Утилита для получения файла спецификации из BOM-перечня.
 
@@ -14,19 +14,7 @@ import csv
 import re
 import argparse
 import sys
-
-type_codes = {
-    'R': 'Резистор',
-    'VT': 'Транзистор',
-    'VD': 'Диод',
-    'X': 'Разъем',
-    'C': 'Конденсатор',
-    'L': 'Дроссель',
-    'D': 'Микросхема',
-    'VT': 'Транзистор',
-    'ZQ': 'Кварцевый резонатор',
-    'XP': 'Вилка штыревая'
-}
+from element_types import element_types
 
 
 def find_type(ref_des):
@@ -44,7 +32,7 @@ def find_type(ref_des):
     # Выделяем код элемента
     code = re.match('[A-Z]*', comp_type).group(0)
     # Возвращаем группу видов элементов
-    return type_codes[code] if code in type_codes else ''
+    return element_types[code] if code in element_types else ''
 
 
 if __name__ == '__main__':
@@ -57,8 +45,8 @@ if __name__ == '__main__':
     parser.add_argument('output', help='файл спецификации')
     args = parser.parse_args()
 
-    with open(args.input, 'r', encoding='cp1251') as inCsv:
-        bom = csv.DictReader(inCsv, delimiter=',')
+    with open(args.input, 'r', encoding='cp1251') as csv_output:
+        bom = csv.DictReader(csv_output, delimiter=',')
 
         componentMap = {}
 
