@@ -1,6 +1,19 @@
+# -*- coding: utf-8 -*-
+"""
+    bomtospec
+    ~~~~~~~~~~~~~~~~~~~~
+
+    Утилита для получения файла спецификации из BOM-перечня.
+
+    :author: Anatol Karalkou
+    :contact: anatol1988@gmail.com
+    :license: Apache License Version 2.0, see LICENSE for details.
+"""
+
 import csv
 import re
 import argparse
+import sys
 
 type_codes = {
     'R': 'Резистор',
@@ -17,12 +30,27 @@ type_codes = {
 
 
 def find_type(ref_des):
-    comp_type = ref_des[ref_des.find(
-        '-') + 1:] if ('-' in ref_des) else ref_des
-    return type_codes[re.match('[A-Z]*', comp_type).group(0)]
+    """
+    Возвращает группу видов элементов
+
+    Параметры
+    _________
+
+    ref_des : Позиционное обозначение элемента
+    """
+    # Выделяем позиционное обозначение
+    comp_type = ref_des[ref_des.find('-') + 1:] if (
+        '-' in ref_des) else ref_des
+    # Выделяем код элемента
+    code = re.match('[A-Z]*', comp_type).group(0)
+    # Возвращаем группу видов элементов
+    return type_codes[code] if code in type_codes else ''
 
 
 if __name__ == '__main__':
+    sys.stdout = open('log.txt', 'w')
+
+    # Настройка аргументов утилиты
     parser = argparse.ArgumentParser(
         description='Выдает список спецификации на основании BOM')
     parser.add_argument('input', help='файл BOM')
