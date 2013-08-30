@@ -45,33 +45,42 @@ if __name__ == '__main__':
     parser.add_argument('output', help='файл спецификации')
     args = parser.parse_args()
 
-    with open(args.input, 'r', encoding='cp1251') as csv_output:
-        bom = csv.DictReader(csv_output, delimiter=',')
+    with open(args.input, 'r', encoding='cp1251') as csv_input:
+        bom = csv.DictReader(csv_input, delimiter=',')
 
-        componentMap = {}
+        # Перечень компонентов с относящимся к ним списком
+        # позиционных обозначений
+        component_map = {}
 
         for position in bom:
-            compName = position['Value']
-            refDes = position['RefDes']
+            comp_name = position['Value']
+            ref_des = position['RefDes']
 
-            if compName not in componentMap:
-                componentMap[compName] = [refDes]
+            if comp_name not in component_map:
+                component_map[comp_name] = [ref_des]
             else:
-                componentMap[compName].append(refDes)
+                component_map[comp_name].append(ref_des)
 
+    # Список спецификации
     specification = []
 
-    for component in componentMap:
-        specification.append({'Раздел': find_type(
-            componentMap[component][0]), 'Наименование': component,
-            'Количество': len(componentMap[component]),
-            'Примечание': ', '.join(componentMap[component])})
+    for component in component_map:
+        specification.append({'Раздел': find_type(component_map[component][0]),
+                              'Наименование': component,
+                              'Количество': len(component_map[component]),
+                              'Примечание': ', '.join(component_map[component])
+                              })
 
-    with open(args.output, 'w', newline='', encoding='cp1251') as outFile:
-        bomOut = csv.DictWriter(
-            outFile, ['Раздел', 'Наименование', 'Количество', 'Примечание'],
-            delimiter=';', quoting=csv.QUOTE_MINIMAL, extrasaction='ignore')
-        bomOut.writeheader()
+    # Записываем спецификацию в файл
+    with open(args.output, 'w', newline='', encoding='cp1251') as csv_output:
+        spec_writer = csv.DictWriter(
+            csv_output,
+            ['Раздел', 'Наименование', 'Количество', 'Примечание'],
+            delimiter=';',
+            quoting=csv.QUOTE_MINIMAL,
+            extrasaction='ignore')
+
+        spec_writer.writeheader()
 
         for component in specification:
-            bomOut.writerow(component)
+            spec_writer.writerow(component)
